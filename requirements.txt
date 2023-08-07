@@ -3,3 +3,4 @@ transformers
 accelerate
 websockets==10.0
 bitsandbytes
+peft
