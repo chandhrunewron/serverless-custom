@@ -22,9 +22,8 @@ def init():
 
     
     config = PeftConfig.from_pretrained(tuned_adapter)
-    model = AutoModelForCausalLM.from_pretrained(base_model,quantization_config=bnb_config,use_cache = "cache",trust_remote_code=True,low_cpu_mem_usage=True).to("cuda:0")
-
-    model = PeftModel.from_pretrained(model, tuned_adapter,use_cache="cache",low_cpu_mem_usage=True ).to("cuda:0")
+    model = AutoModelForCausalLM.from_pretrained(base_model,quantization_config=bnb_config,use_cache = "cache",trust_remote_code=True,low_cpu_mem_usage=True)
+    model = PeftModel.from_pretrained(model, tuned_adapter,use_cache="cache",low_cpu_mem_usage=True )
     # context = {"model":model,"tokenizer":tokenizer}
     
     # model = GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B", revision="float16", torch_dtype=torch.float16, low_cpu_mem_usage=True)
