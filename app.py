@@ -1,5 +1,6 @@
-from transformers import GPTJForCausalLM, GPT2Tokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, AutoTokenizer
 import torch
+from peft import PeftModel, PeftConfig
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
@@ -9,8 +10,22 @@ def init():
     global model
     global tokenizer
 
+    base_model = "TinyPixel/Llama-2-7B-bf16-sharded"
+    tuned_adapter = "newronai/llama-2-7b-QLoRA-Trial1"
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.float16,
+    )
+
+    
+    config = PeftConfig.from_pretrained(tuned_adapter)
+    model = AutoModelForCausalLM.from_pretrained(base_model,quantization_config=bnb_config,trust_remote_code=True)
+    model.config.use_cache = False
+    model = PeftModel.from_pretrained(model, tuned_adapter)
+    
     print("loading to CPU...")
-    model = GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B", revision="float16", torch_dtype=torch.float16, low_cpu_mem_usage=True)
+    # model = GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B", revision="float16", torch_dtype=torch.float16, low_cpu_mem_usage=True)
     print("done")
 
     # conditionally load to GPU
@@ -19,7 +34,9 @@ def init():
         model.cuda()
         print("done")
 
-    tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-j-6B")
+    # tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-j-6B")
+    tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
+    tokenizer.pad_token = tokenizer.eos_token
 
 
 # Inference is ran for every server call
