@@ -3,4 +3,5 @@ transformers
 accelerate
 websockets==10.0
 bitsandbytes
-peft
+peft @ git+https://github.com/huggingface/peft.git
+scipy
