@@ -88,3 +88,5 @@ def handler(context: dict, request: Request) -> Response:
 
     # # Return the results as a dictionary
     # return result
+if __name__ == "__main__":
+    app.serve()
