@@ -4,7 +4,7 @@ from peft import PeftModel, PeftConfig
 from potassium import Potassium, Request, Response
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
-
+print(device)
 # Init is ran on server startup
 # Load your model to GPU as a global variable here.
 app = Potassium("my_app")
@@ -57,8 +57,8 @@ def handler(context: dict, request: Request) -> Response:
     tokenizer = context.get("tokenizer")
     model = context.get("model")
 
-    inputs = tokenizer.encode(prompt, return_tensors="pt").to("cuda")
-    outputs = model.generate(inputs, max_new_tokens=int(max_new_tokens))
+    inputs = tokenizer.encode(prompt, return_tensors="pt").to(device)
+    outputs = model.generate(inputs)
     output = tokenizer.decode(outputs[0])
 
     return Response(
