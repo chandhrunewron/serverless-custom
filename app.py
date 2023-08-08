@@ -58,9 +58,7 @@ def handler(context: dict, request: Request) -> Response:
     model = context.get("model")
 
     inputs = tokenizer.encode(prompt, return_tensors="pt").to(device)
-    print("Shape:",inputs.shape)
-    print(inputs)
-    outputs = model.generate(inputs[0])
+    outputs = model.generate(**inputs, max_new_tokens=50)
     output = tokenizer.decode(outputs[0])
 
     return Response(
