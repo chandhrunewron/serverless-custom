@@ -23,12 +23,15 @@ def download_model():
 
     
     config = PeftConfig.from_pretrained(tuned_adapter)
-    model = AutoModelForCausalLM.from_pretrained(base_model,quantization_config=bnb_config,trust_remote_code=True)
-    model.config.use_cache = True
+    model = AutoModelForCausalLM.from_pretrained(base_model,
+                                                 quantization_config=bnb_config, 
+                                                 torch_dtype=torch.bfloat16,
+                                                 low_cpu_mem_usage=True,
+                                                 use_cache = "cache")
     model = PeftModel.from_pretrained(model, tuned_adapter)
     
     # tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-j-6B")
-    tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(base_model, use_cache = "cache")
     tokenizer.pad_token = tokenizer.eos_token
 
 
