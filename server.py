@@ -9,6 +9,7 @@ import app as user_src
 
 # We do the model load-to-GPU step on server startup
 # so the model object is available globally for reuse
+print("Initializing Server...")
 user_src.init()
 
 # Create the http server app
