@@ -44,12 +44,12 @@ def init():
 def inference(model_inputs:dict) -> dict:
     global model
     global tokenizer
-
+    print("Inferring...")
     # Parse out your arguments
     prompt = model_inputs.get('prompt', None)
     if prompt == None:
         return {'message': "No prompt provided"}
-    
+    print("Tokenizing inputs")
     # Tokenize inputs
     input_tokens = tokenizer.encode(prompt, return_tensors="pt").to(device)
 
