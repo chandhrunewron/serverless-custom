@@ -10,8 +10,8 @@ from peft import PeftModel, PeftConfig
 def download_model():
     # do a dry run of loading the huggingface model, which will download weights
     print("downloading model...")
-    global model
-    global tokenizer
+    # global model
+    # global tokenizer
 
     base_model = "TinyPixel/Llama-2-7B-bf16-sharded"
     tuned_adapter = "newronai/llama-2-7b-QLoRA-Trial1"
