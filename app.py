@@ -27,7 +27,7 @@ def init():
                                                  torch_dtype=torch.bfloat16,
                                                  quantization_config=bnb_config,
                                                  use_cache = "cache",
-                                                 low_cpu_mem_usage=True).to(device)
+                                                 low_cpu_mem_usage=True)
     model = PeftModel.from_pretrained(model, tuned_adapter)
     # context = {"model":model,"tokenizer":tokenizer}
     
