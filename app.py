@@ -84,7 +84,7 @@ def handler(context: dict, request: Request) -> Response:
 #     # Decode output tokens
 #     output_text = tokenizer.batch_decode(output, skip_special_tokens = True)[0]
 
-    result = {"output": output_text}
+    # result = {"output": output_text}
 
-    # Return the results as a dictionary
-    return result
+    # # Return the results as a dictionary
+    # return result
