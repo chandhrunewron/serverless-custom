@@ -12,9 +12,6 @@ app = Potassium("my_app")
 # @app.init runs at startup, and loads models into the app's context
 @app.init
 def init():
-
-    global model
-    global tokenizer
     print("loading to CPU...")
     base_model = "TinyPixel/Llama-2-7B-bf16-sharded"
     tuned_adapter = "newronai/llama-2-7b-QLoRA-Trial1"
@@ -38,15 +35,19 @@ def init():
     print("done")
 
     # conditionally load to GPU
-    if device == "cuda:0":
-        print("loading to GPU...")
-        model.cuda()
-        print("done")
+    # if device == "cuda:0":
+    #     print("loading to GPU...")
+    #     model.cuda()
+    #     print("done")
 
     # tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-j-6B")
     tokenizer = AutoTokenizer.from_pretrained(base_model, use_cache="cache")
     tokenizer.pad_token = tokenizer.eos_token
-
+    context = {
+        "model": model,
+        "tokenizer": tokenizer
+    }
+    return context
 
 @app.handler("/")
 def handler(context: dict, request: Request) -> Response:
