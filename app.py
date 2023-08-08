@@ -7,6 +7,10 @@ device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 # Init is ran on server startup
 # Load your model to GPU as a global variable here.
+app = Potassium("my_app")
+
+# @app.init runs at startup, and loads models into the app's context
+@app.init
 def init():
 
     global model
@@ -26,7 +30,7 @@ def init():
                                                  torch_dtype=torch.bfloat16,
                                                  quantization_config=bnb_config,
                                                  use_cache = "cache",
-                                                 low_cpu_mem_usage=True)
+                                                 low_cpu_mem_usage=True).to(device)
     model = PeftModel.from_pretrained(model, tuned_adapter)
     # context = {"model":model,"tokenizer":tokenizer}
     
@@ -43,25 +47,42 @@ def init():
     tokenizer = AutoTokenizer.from_pretrained(base_model, use_cache="cache")
     tokenizer.pad_token = tokenizer.eos_token
 
+
+@app.handler("/")
+def handler(context: dict, request: Request) -> Response:
+    prompt = request.json.get("prompt")
+    max_new_tokens = request.json.get("max_new_tokens")
+
+    tokenizer = context.get("tokenizer")
+    model = context.get("model")
+
+    inputs = tokenizer.encode(prompt, return_tensors="pt").to("cuda")
+    outputs = model.generate(inputs, max_new_tokens=int(max_new_tokens))
+    output = tokenizer.decode(outputs[0])
+
+    return Response(
+        json = {"outputs": output}, 
+        status=200
+    )
 # Inference is ran for every server call
 # Reference your preloaded global model variable here.
-def inference(model_inputs:dict) -> dict:
-    global model
-    global tokenizer
-    print("Inferring...")
-    # Parse out your arguments
-    prompt = model_inputs.get('prompt', None)
-    if prompt == None:
-        return {'message': "No prompt provided"}
-    print("Tokenizing inputs")
-    # Tokenize inputs
-    input_tokens = tokenizer.encode(prompt, return_tensors="pt").to(device)
+# def inference(model_inputs:dict) -> dict:
+#     global model
+#     global tokenizer
+#     print("Inferring...")
+#     # Parse out your arguments
+#     prompt = model_inputs.get('prompt', None)
+#     if prompt == None:
+#         return {'message': "No prompt provided"}
+#     print("Tokenizing inputs")
+#     # Tokenize inputs
+#     input_tokens = tokenizer.encode(prompt, return_tensors="pt").to(device)
 
-    # Run the model
-    output = model.generate(input_tokens)
+#     # Run the model
+#     output = model.generate(input_tokens)
 
-    # Decode output tokens
-    output_text = tokenizer.batch_decode(output, skip_special_tokens = True)[0]
+#     # Decode output tokens
+#     output_text = tokenizer.batch_decode(output, skip_special_tokens = True)[0]
 
     result = {"output": output_text}
 
