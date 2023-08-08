@@ -59,7 +59,7 @@ def handler(context: dict, request: Request) -> Response:
 
     inputs = tokenizer.encode(prompt, return_tensors="pt").to(device)
     print(type(inputs['input_ids']))
-    outputs = model.generate(inputs['input_ids'], max_new_tokens=128)
+    outputs = model.generate(inputs['input_ids'], max_new_tokens=50)
     output = tokenizer.decode(outputs[0])
 
     return Response(
